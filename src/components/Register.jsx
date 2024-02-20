@@ -2,12 +2,11 @@ import React, { useEffect, useState } from 'react'
 import { useForm } from "react-hook-form"
 import { useNavigate, useParams } from "react-router-dom"
 import Input from './useForm/Input'
-import Select from './useForm/Select'
 import RadioButton from './useForm/RadioButton'
 import Button from './useForm/Button'
 import { useLazyQuery, useMutation } from '@apollo/client';
-import { CREATE_USER, UPDATE_USER } from '../graphQl/mutation'
-import { GET_USER } from '../graphQl/query'
+import { CREATE_USER, UPDATE_USER, UPDATE_PROFILE } from '../graphQl/mutation'
+import { GET_USER, GER_USER_INFO } from '../graphQl/query'
 import { toast } from 'react-toastify'
 import Checkbox from './useForm/Checkbox'
 
@@ -16,9 +15,12 @@ const Register = () => {
 
     const { id } = useParams();
 
-    const [createUser, { data, error }] = useMutation(CREATE_USER);
+    const [isUser, setIsUser] = useState(false)
 
-    const [UpdateUserByAdmin, { updatedData, updateError }] = useMutation(UPDATE_USER);
+    const [createUser] = useMutation(CREATE_USER);
+    const [UpdateUserByAdmin] = useMutation(UPDATE_USER);
+    const [UpdateUser] = useMutation(UPDATE_PROFILE);
+
 
     const {
         register,
@@ -33,6 +35,7 @@ const Register = () => {
 
     let formattedDateOfBirth;
     const [GetUserByAdmin, { loading, error: geterror, data: getdata, refetch }] = useLazyQuery(GET_USER);
+    const [GetUser] = useLazyQuery(GER_USER_INFO);
 
     useEffect(() => {
         if (id) {
@@ -41,22 +44,29 @@ const Register = () => {
                     id
                 }
             }).then((res) => {
-                console.log("rs: ", res.data);               
+                console.log("rs: ", res.data);
                 reset(res.data.getUserByAdmin)
                 formattedDateOfBirth = res.data.getUserByAdmin.dateofbirth ? new Date(res.data.getUserByAdmin.dateofbirth).toISOString().split('T')[0] : '';
-                console.log("formattedDateOfBirth-----------",formattedDateOfBirth);
+                console.log("formattedDateOfBirth-----------", formattedDateOfBirth);
                 setValue("dateofbirth", formattedDateOfBirth)
             })
+        } else if (localStorage.getItem('roll') === 'user') {
+            setIsUser(true)            
+            GetUser()
+                .then((res) => {
+                    console.log("rs: ", res.data);
+                    reset(res.data.getUser)
+                    formattedDateOfBirth = res.data.getUser.dateofbirth ? new Date(res.data.getUser.dateofbirth).toISOString().split('T')[0] : '';
+                    console.log("formattedDateOfBirth-----------", formattedDateOfBirth);
+                    setValue("dateofbirth", formattedDateOfBirth)
+                })
         }
     }, [])
 
     const genderOption = ["male", "female"]
-    const isActiveOption = [true]   
+    const isActiveOption = [true]
 
-    const onSubmit = (data) => {
-
-        console.log("active-------------:", data.active);
-
+    const onSubmit = (data) => {    
         if (id) {
             const keys = Object.keys(dirtyFields);
             const filteredObject = Object.fromEntries(
@@ -80,6 +90,32 @@ const Register = () => {
                     console.log(result.data);
                     navigate('/admin-dashboard');
                     toast.success("User Updated Successfully!");
+                })
+                .catch((error) => {
+                    console.log(error.message);
+                    toast.error(error.message);
+                });
+        } else if (localStorage.getItem('roll') === 'user') {
+            const keys = Object.keys(dirtyFields);
+            const filteredObject = Object.fromEntries(
+                Object.entries(data).filter(([key]) => keys.includes(key))
+            );
+            console.log(filteredObject);
+
+            if(filteredObject.age){
+                filteredObject.age =  Number(filteredObject.age)             
+            }
+            UpdateUser({
+                variables: {
+                    input: {
+                        ...filteredObject                              
+                    },
+                }
+            })
+                .then((result) => {
+                    console.log(result.data);
+                    navigate(-1);
+                    toast.success("Profile Updated Successfully!");
                 })
                 .catch((error) => {
                     console.log(error.message);
@@ -143,7 +179,7 @@ const Register = () => {
                                     />
                                 </div>
 
-                                <div className="sm:col-span-4">
+                                {!isUser && <div className="sm:col-span-4">
                                     <Input
                                         label={"Email"}
                                         type={"email"}
@@ -157,9 +193,9 @@ const Register = () => {
                                         })}
                                         error={errors.email}
                                     />
-                                </div>
+                                </div>}
 
-                                {!id &&
+                                {!isUser && !id &&
                                     <div className="sm:col-span-4">
                                         <Input
                                             label={"Password"}
@@ -177,7 +213,7 @@ const Register = () => {
                                     </div>
                                 }
 
-                                {!id &&
+                                {!isUser && !id &&
                                     <div className="sm:col-span-4">
                                         <Input
                                             label={"Confirm Password"}
@@ -240,7 +276,7 @@ const Register = () => {
                                 <div className="sm:col-span-2">
                                     <Input
                                         label={"Date Of Birth"}
-                                        type={"date"}                                       
+                                        type={"date"}
                                         className={""}
                                         {...register("dateofbirth", { required: true })}
                                         error={errors.dateofbirth}
@@ -258,21 +294,13 @@ const Register = () => {
                                 </div>
 
                             </div>
-                            {!id && <div className="mt-10">
+                            <div className="mt-10">
                                 <Button
-                                    label={"Register"}
+                                    label={isUser || id ? `Update` : `Register`}
                                     type={"submit"}
                                     className={"flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"}
                                 />
-                            </div>}
-
-                            {id && <div className="mt-10">
-                                <Button
-                                    label={"Update"}
-                                    type={"submit"}
-                                    className={"flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"}
-                                />
-                            </div>}
+                            </div>                         
                         </div>
                     </div>
                 </form>

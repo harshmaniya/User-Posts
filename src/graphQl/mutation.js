@@ -100,3 +100,10 @@ export const TOKEN_VERIFICATION = gql`
 mutation TokenVerification($token: String!) {
   tokenVerification(token: $token)
 }`
+
+export const UPDATE_PROFILE = gql`
+mutation UpdateUser($input: updateUserInput) {
+  updateUser(input: $input) {
+    _id 
+  }
+}`

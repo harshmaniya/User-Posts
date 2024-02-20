@@ -14,8 +14,6 @@ function PublicAuthentication() {
       if (token) {
         // console.log("Token found, setting authToken:", token);
         setAuthToken(token);
-      } else {       
-        // toast.error("No token found.");
       }
     }, []);
     return authToken

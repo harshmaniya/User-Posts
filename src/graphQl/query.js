@@ -163,3 +163,16 @@ query Query {
      url
   }
 }`
+
+export const GER_USER_INFO = gql`
+query GetUser {
+  getUser {
+    _id
+    firstName
+    lastName
+    gender
+    hobbies
+    dateofbirth
+    age
+  }
+}`

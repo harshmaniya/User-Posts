@@ -6,6 +6,7 @@ import Profile from './user/Profile';
 import UpdatePost from './user/UpdatePost';
 import Error404 from './Error404';
 import Navbar from './user/Navbar';
+import ProfileUpdate from './user/ProfileUpdate';
 
 function UserRoutes() {
     const navigate = useNavigate();
@@ -21,10 +22,13 @@ function UserRoutes() {
         <>
             <Navbar />
             <Routes>
-                <Route exact path='/' element={<UserDashboard />} />
-                <Route exact path="create-post" element={<CreatePost />} />
-                <Route exact path="profile" element={<Profile />} />
-                <Route exact path="updatepost/:id" element={<UpdatePost />} />
+                <Route path='/' element={<UserDashboard />} />
+                <Route path="create-post" element={<CreatePost />} />
+                <Route path="profile">
+                    <Route index element={<Profile />} />
+                    <Route path="update" element={<ProfileUpdate />} />
+                </Route>
+                <Route path="updatepost/:id" element={<UpdatePost />} />
                 <Route path='*' element={<Error404 />} />
             </Routes>
         </>
