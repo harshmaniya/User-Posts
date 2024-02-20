@@ -5,10 +5,11 @@ import Input from './useForm/Input'
 import Select from './useForm/Select'
 import RadioButton from './useForm/RadioButton'
 import Button from './useForm/Button'
-import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
+import { useLazyQuery, useMutation } from '@apollo/client';
 import { CREATE_USER, UPDATE_USER } from '../graphQl/mutation'
 import { GET_USER } from '../graphQl/query'
 import { toast } from 'react-toastify'
+import Checkbox from './useForm/Checkbox'
 
 const Register = () => {
     const navigate = useNavigate();
@@ -24,11 +25,13 @@ const Register = () => {
         handleSubmit,
         reset,
         getValues,
+        setValue,
         formState: { errors, dirtyFields },
     } = useForm({
         defaultValues: { firstName: "", lastName: "", email: "", password: "", cpassword: "", gender: false, age: null, dateofbirth: null, hobbies: "" }
     })
 
+    let formattedDateOfBirth;
     const [GetUserByAdmin, { loading, error: geterror, data: getdata, refetch }] = useLazyQuery(GET_USER);
 
     useEffect(() => {
@@ -38,40 +41,37 @@ const Register = () => {
                     id
                 }
             }).then((res) => {
-                console.log("rs: ", res);
+                console.log("rs: ", res.data);               
                 reset(res.data.getUserByAdmin)
+                formattedDateOfBirth = res.data.getUserByAdmin.dateofbirth ? new Date(res.data.getUserByAdmin.dateofbirth).toISOString().split('T')[0] : '';
+                console.log("formattedDateOfBirth-----------",formattedDateOfBirth);
+                setValue("dateofbirth", formattedDateOfBirth)
             })
         }
     }, [])
 
     const genderOption = ["male", "female"]
-    const isActiveOption = [
-        { label: 'Active', value: true },
-        { label: 'Inactive', value: false }
-    ];
+    const isActiveOption = [true]   
 
     const onSubmit = (data) => {
-               
+
+        console.log("active-------------:", data.active);
+
         if (id) {
             const keys = Object.keys(dirtyFields);
             const filteredObject = Object.fromEntries(
                 Object.entries(data).filter(([key]) => keys.includes(key))
             );
             console.log(filteredObject);
-            
-            // const { , active, ...rest } = filteredObject
-            let isActive;
-            if (data.active === "true") {
-                isActive = true
-            } else {
-                isActive = false
+
+            if (filteredObject.active) {
+                filteredObject.active = Boolean(filteredObject.active)
             }
             UpdateUserByAdmin({
                 variables: {
                     input: {
                         ...filteredObject,
                         age: Number(data.age),
-                        active: isActive,
                         _id: id
                     },
                 }
@@ -197,13 +197,22 @@ const Register = () => {
                                 }
 
 
-                                {id && <div className="sm:col-span-4">
+                                {/* {id && <div className="sm:col-span-4">
                                     <Select
                                         label={"isActive"}
-                                        options={isActiveOption}
-                                        className={""}
+                                        options={isActiveOption}                                    
                                         {...register("active", { required: true })}
                                         error={errors.active}
+                                    />
+                                </div>
+                                } */}
+
+
+                                {id && <div className="sm:col-span-4">
+                                    <Checkbox
+                                        label={"isActive"}
+                                        option={isActiveOption}
+                                        {...register("active")}
                                     />
                                 </div>
                                 }
@@ -231,7 +240,7 @@ const Register = () => {
                                 <div className="sm:col-span-2">
                                     <Input
                                         label={"Date Of Birth"}
-                                        type={"date"}
+                                        type={"date"}                                       
                                         className={""}
                                         {...register("dateofbirth", { required: true })}
                                         error={errors.dateofbirth}

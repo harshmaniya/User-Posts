@@ -13,9 +13,9 @@ function CheckBoxButton({
         <>
 
             <div className="mb-3 row">
-                <label className="form-label col-auto">
+                {/* <label className="form-label col-auto">
                     {label}
-                </label>
+                </label> */}
                 {option.map((data)=>(
                     <div className="form-check col-auto">
                         <input
@@ -27,7 +27,7 @@ function CheckBoxButton({
                             value={data}
                             {...props}
                         />
-                        {<label className="form-check-label">{data}</label>}
+                        {<label className="form-check-label ml-3">{label}</label>}
                     </div>
                 ))}
                 {error && <span className='text-red-500'>{label} is required</span>}

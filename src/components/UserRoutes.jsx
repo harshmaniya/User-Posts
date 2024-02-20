@@ -16,7 +16,9 @@ function UserRoutes() {
     }
 
     return (
-        token && tempRoll === "user" && <Routes>
+        token && tempRoll === "user" && 
+        
+        <Routes>    
             <Route exact path='/' element={<UserDashboard />} />
             <Route exact path="create-post" element={<CreatePost />} />
             <Route exact path="profile" element={<Profile />} />
