@@ -2,7 +2,6 @@ import { useQuery } from '@apollo/client';
 import { useParams } from 'react-router-dom'
 import { GET_POSTS_PAGINATION } from '../../graphQl/query'
 import Pagination from '../user/Pagination';
-import Navbar from './Navbar';
 import { useState } from 'react';
 
 const ViewPosts = () => {
@@ -63,8 +62,7 @@ const ViewPosts = () => {
     // }
 
     return (
-        <>
-            <Navbar />
+        <>        
             {/* {isData && ( */}
                 <div className="overflow-x-auto p-8">
                     <table className="table-auto w-full border-collapse border border-gray-200">

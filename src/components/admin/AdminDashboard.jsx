@@ -7,7 +7,7 @@ const AdminDashboard = () => {
     return (
         <>
             <div>
-                <Navbar />
+                {/* <Navbar /> */}
                 <div className="p-6">
                     <GetUsers />
                 </div>

@@ -26,7 +26,7 @@ const UserDashboard = () => {
     return (
         <>
             <div className='h-screen'>
-                <Navbar />
+                {/* <Navbar /> */}
                 <div className="grid grid-cols-4 gap-2 mt-2 p-10">
                     {data?.getPaginatedPosts?.docs.map((res) => (
                         <Card
