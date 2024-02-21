@@ -107,3 +107,8 @@ mutation UpdateUser($input: updateUserInput) {
     _id 
   }
 }`
+
+export const RESEND_VERIFICATION_TOKEN = gql`
+mutation ResendVerificationEmail($email: String) {
+  resendVerificationEmail(email: $email)
+}`

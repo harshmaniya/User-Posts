@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom'
 import { useMutation } from '@apollo/client';
 import { DELETE_POST } from '../../graphQl/mutation'
@@ -62,16 +63,12 @@ const Card = ({ id, title, description, createdBy, refetch }) => {
         console.log(result.data);
         setIsModalOpen(false);
         await refetch()
-        toast.success("Successfully Deleted!", {
-          position: toast.POSITION.TOP_CENTER,
-        });
+        toast.success("Successfully Deleted!");
 
       })
       .catch((error) => {
         console.log(error.message);
-        toast.error(error.message, {
-          position: toast.POSITION.TOP_RIGHT
-        });
+        toast.error(error.message);
       });
 
   };

@@ -16,6 +16,7 @@ const Register = () => {
     const { id } = useParams();
 
     const [isUser, setIsUser] = useState(false)
+    const [verifyDialog, setVerifyDialog] = useState(false)
 
     const [createUser] = useMutation(CREATE_USER);
     const [UpdateUserByAdmin] = useMutation(UPDATE_USER);
@@ -51,7 +52,7 @@ const Register = () => {
                 setValue("dateofbirth", formattedDateOfBirth)
             })
         } else if (localStorage.getItem('roll') === 'user') {
-            setIsUser(true)            
+            setIsUser(true)
             GetUser()
                 .then((res) => {
                     console.log("rs: ", res.data);
@@ -66,7 +67,7 @@ const Register = () => {
     const genderOption = ["male", "female"]
     const isActiveOption = [true]
 
-    const onSubmit = (data) => {    
+    const onSubmit = (data) => {
         if (id) {
             const keys = Object.keys(dirtyFields);
             const filteredObject = Object.fromEntries(
@@ -102,13 +103,13 @@ const Register = () => {
             );
             console.log(filteredObject);
 
-            if(filteredObject.age){
-                filteredObject.age =  Number(filteredObject.age)             
+            if (filteredObject.age) {
+                filteredObject.age = Number(filteredObject.age)
             }
             UpdateUser({
                 variables: {
                     input: {
-                        ...filteredObject                              
+                        ...filteredObject
                     },
                 }
             })
@@ -139,7 +140,7 @@ const Register = () => {
             })
                 .then((result) => {
                     console.log(result.data);
-                    navigate('/login');
+                    setVerifyDialog(true)
                     toast.success("Success Register!");
                 })
                 .catch((error) => {
@@ -300,11 +301,30 @@ const Register = () => {
                                     type={"submit"}
                                     className={"flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"}
                                 />
-                            </div>                         
+                            </div>
                         </div>
                     </div>
                 </form>
             </div>
+
+
+            {verifyDialog && <div className="fixed inset-0 flex items-center justify-center backdrop-filter backdrop-blur-lg bg-opacity-75">
+                <div className="bg-white p-8 rounded shadow-md">
+                    <h2 className="text-2xl font-bold mb-4">Registration Successful!</h2>
+                    <p className="text-gray-600 mb-1">
+                        We have sent a verification email to your registered email address.                        
+                    </p>
+                    <p className="text-gray-600 mb-6">                       
+                        Please verify your email to activate your account.
+                    </p>
+                    <button
+                        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 focus:outline-none"
+                        onClick={() => navigate('/')}
+                    >
+                        Okay, got it!
+                    </button>
+                </div>
+            </div>}
         </>
     )
 }

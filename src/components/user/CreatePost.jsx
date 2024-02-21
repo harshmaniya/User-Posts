@@ -11,20 +11,12 @@ const CreatePost = () => {
 
     const navigate = useNavigate();
 
-    const [CreatePost, { data, error }] = useMutation(CREATE_POST);
+    const [CreatePost] = useMutation(CREATE_POST);
 
     const {
         register,
-        watch,
-        setValue,
-        reset,
-        setFocus,
-        clearErrors,
-        touchedFields,
-        getValues,
-        setError,
         handleSubmit,
-        formState: { isLoading, isValid, isDirty, isSubmitted, isSubmitSuccessful, errors },
+        formState: { errors },
     } = useForm({
         defaultValues: { title: "", description: "" }
     })
@@ -45,7 +37,7 @@ const CreatePost = () => {
                 toast.success("Post created Successfully!");
             })
             .catch((error) => {
-                console.log(error.message);                  
+                console.log(error.message);
                 toast.error(error.message);
             });
     }
@@ -60,7 +52,7 @@ const CreatePost = () => {
                 </div>
                 <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
                     <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
-                        <div>                            
+                        <div>
                             <div className="mt-2">
                                 <Input
                                     label={"Title"}
@@ -80,7 +72,7 @@ const CreatePost = () => {
                                     {...register("description", { required: true })}
                                     error={errors.description}
                                 />
-                            </div>                           
+                            </div>
                         </div>
                         <div>
                             <Button
@@ -89,7 +81,7 @@ const CreatePost = () => {
                                 className={"flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"}
                             />
                         </div>
-                    </form>                    
+                    </form>
                 </div>
             </div>
         </>
