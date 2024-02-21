@@ -19,18 +19,18 @@ const Navbar = () => {
                             </svg>
                         </button>
                     </div>
-                    <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">                       
+                    <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
                         <div className="hidden sm:ml-6 sm:block">
                             <div className="flex space-x-4">
                                 <Link to="/userdashboard" className="bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium" aria-current="page">Admin Dashboard</Link>
                                 {/* <Link to="profile" className="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium">Profile</Link> */}
                                 {/* <Link to="create-post" className="text-gray-300 bg-blue-700 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium">+ Post</Link>                                                                 */}
-                            </div>                        
+                            </div>
                         </div>
                     </div>
-                    <Logout className="flex items-end"/>
+                    <Logout className="flex items-end" />
                 </div>
-            </div>            
+            </div>
         </nav>
     );
 };

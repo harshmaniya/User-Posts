@@ -110,7 +110,7 @@ const Verification = () => {
                 </div>
             </div>}
 
-            {!verifyDialog && <div className="fixed inset-0 flex items-center justify-center backdrop-filter backdrop-blur-lg bg-opacity-75">
+            {!data && !verifyDialog && <div className="fixed inset-0 flex items-center justify-center backdrop-filter backdrop-blur-lg bg-opacity-75">
                 <div className="bg-white p-8 rounded shadow-md">
                     <h2 className="text-2xl font-bold mb-4">Request accepted!</h2>
                     <p className="text-gray-600 mb-1">

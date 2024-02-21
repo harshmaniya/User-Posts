@@ -4,6 +4,7 @@ import { GET_USERS, GET_USERS_PAGINATION } from '../../graphQl/query'
 import { DELETE_USER } from '../../graphQl/mutation'
 import { useEffect, useState } from 'react';
 import Pagination from '../user/Pagination';
+import debounce from 'debounce';
 
 const DeleteUserModal = ({ id, onClose, onDelete }) => {
     return (
@@ -78,7 +79,6 @@ const GetUsers = () => {
             });
     };
 
-    // const { loading, error, data, refetch } = useQuery(GET_USERS);
     const { loading, error, data, refetch } = useQuery(GET_USERS_PAGINATION, {
         variables: {
             input: {
@@ -97,6 +97,18 @@ const GetUsers = () => {
 
     const totalPages = data?.getUsersByAdminPaginated?.totalPages;
 
+
+
+    const handleDebounce = debounce((value) => {
+        setSearch(value);
+    }, 1000);
+
+    const handleSearch = (e) => {
+        const inputValue = e.target.value;
+        handleDebounce(inputValue);
+    };
+
+
     useEffect(() => {
         refetch();
     }, [currentPage, sortBy]);
@@ -106,11 +118,18 @@ const GetUsers = () => {
             column,
             order: sortBy.column === column ? sortBy.order === 'asc' ? 'desc' : 'asc' : 'asc',
         });
+        setCurrentPage(1)
+        // handlePageChange(1)
     };
 
-    // if (error) return <h1>{error.message}</h1>
-
     // console.log(data?.getUsersByAdmin);
+    // if (!data) {
+    //     return (
+    //         <>
+    //             <h1 className='text-4xl flex justify-center'>Users not available!</h1>
+    //         </>
+    //     )
+    // }
 
     return (
         <>
@@ -125,7 +144,7 @@ const GetUsers = () => {
                         type="text"
                         placeholder="Search..."
                         className="w-64 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
-                        onChange={(e) => setSearch(e.target.value)}
+                        onChange={(e) => handleSearch(e)}
                     />
                     {/* <button
                         className="absolute right-0 top-0 mt-2 mr-2 text-gray-600 focus:outline-none"
