@@ -55,8 +55,7 @@ const Login = () => {
             .then((result) => {
                 console.log(result.data);
                 localStorage.setItem('token', result.data.login.accessToken)
-                localStorage.setItem('roll', result.data.login.roll)
-                // console.log("time");
+                localStorage.setItem('roll', result.data.login.roll)              
 
                 if (result.data.login.roll === "user") {
                     navigate('/userdashboard')

@@ -5,6 +5,7 @@ import { DELETE_USER } from '../../graphQl/mutation'
 import { useEffect, useState } from 'react';
 import Pagination from '../user/Pagination';
 import debounce from 'debounce';
+import Loader from '../Loader'
 
 const DeleteUserModal = ({ id, onClose, onDelete }) => {
     return (
@@ -42,7 +43,7 @@ const DeleteUserModal = ({ id, onClose, onDelete }) => {
 
 const GetUsers = () => {
     const [currentPage, setCurrentPage] = useState(1);
-    const [sortBy, setSortBy] = useState({ column: 'createdAt', order: 'asc' });
+    const [sortBy, setSortBy] = useState({ column: 'createdAt', order: 1 });
     const [search, setSearch] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [deleteId, setDeleteID] = useState("");
@@ -97,8 +98,6 @@ const GetUsers = () => {
 
     const totalPages = data?.getUsersByAdminPaginated?.totalPages;
 
-
-
     const handleDebounce = debounce((value) => {
         setSearch(value);
     }, 1000);
@@ -108,7 +107,6 @@ const GetUsers = () => {
         handleDebounce(inputValue);
     };
 
-
     useEffect(() => {
         refetch();
     }, [currentPage, sortBy]);
@@ -116,53 +114,27 @@ const GetUsers = () => {
     const handleSort = (column) => {
         setSortBy({
             column,
-            order: sortBy.column === column ? sortBy.order === 'asc' ? 'desc' : 'asc' : 'asc',
+            order: sortBy.column === column ? sortBy.order === 1 ? -1 : 1 : 1,
         });
-        setCurrentPage(1)
-        // handlePageChange(1)
+        setCurrentPage(1) 
     };
 
-    // console.log(data?.getUsersByAdmin);
-    // if (!data) {
-    //     return (
-    //         <>
-    //             <h1 className='text-4xl flex justify-center'>Users not available!</h1>
-    //         </>
-    //     )
-    // }
+    if (currentPage === 1 && loading) {      
+        return (<Loader />)
+    }
 
     return (
         <>
-            {/* {loading && <div className="flex items-center justify-center min-h-screen">
-                <div className="animate-spin rounded-full border-t-4 border-blue-500 border-solid h-12 w-12">
-                </div>
-            </div>} */}
 
             <div className="overflow-x-auto">
                 <div className="relative flex justify-end mb-3">
                     <input
                         type="text"
                         placeholder="Search..."
+                        // value={search}
                         className="w-64 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
                         onChange={(e) => handleSearch(e)}
                     />
-                    {/* <button
-                        className="absolute right-0 top-0 mt-2 mr-2 text-gray-600 focus:outline-none"
-                    >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            viewBox="0 0 24 24"
-                            className="w-6 h-6"
-                        >
-                            <circle cx="11" cy="11" r="8"></circle>
-                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                        </svg>
-                    </button> */}
                 </div>
 
                 <table className="table-auto min-w-full border-collapse border border-gray-200">

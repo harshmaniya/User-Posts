@@ -1,8 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import ReactPaginate from 'react-paginate';
 
 const Pagination = ({ pageCount, onPageChange }) => {
-
 
   return (
     <ReactPaginate
@@ -16,7 +15,7 @@ const Pagination = ({ pageCount, onPageChange }) => {
       breakClassName={'mx-2 text-gray-600'}
       previousClassName={'mx-2 text-sky-500 cursor-pointer px-2 py-1.5'}
       nextClassName={'mx-2 text-sky-500 cursor-pointer px-2 py-1.5'}
-      disabledClassName={'mx-2 text-gray-300 cursor-not-allowed'}      
+      disabledClassName={'mx-2 text-gray-300 cursor-not-allowed'}
     />
   );
 };

@@ -16,6 +16,7 @@ const ChangePassword = () => {
     const {
         register,
         handleSubmit,
+        reset,
         formState: { errors }
     } = useForm({
         defaultValues: { oldPassword: "", newPassword: "", confirmPassword: "" }
@@ -33,10 +34,12 @@ const ChangePassword = () => {
         })
             .then((result) => {
                 console.log(result.data);
+                reset();
                 toast.success("Password Change Successfully!");
             })
             .catch((error) => {
                 console.log(error.message);
+                reset(); 
                 toast.error(error.message);
             });
     }

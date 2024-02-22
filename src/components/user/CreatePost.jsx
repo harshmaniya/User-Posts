@@ -44,7 +44,14 @@ const CreatePost = () => {
 
     return (
         <>
-            <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
+            <div>
+                <Button
+                    label={"back to home"}
+                    onClick={()=> navigate("/userdashboard")}
+                    className={"flex w-fit m-5 rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"}
+                />
+            </div>
+            <div className="bg-slate-100 flex max-w-md mx-auto flex-col items-center justify-center shadow-md px-6 py-12 lg:px-8">
                 <div className="sm:mx-auto sm:w-full sm:max-w-sm">
                     <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
                         Create Post
