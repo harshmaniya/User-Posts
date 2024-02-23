@@ -141,7 +141,6 @@ const Register = () => {
                 .then((result) => {
                     console.log(result.data);
                     setVerifyDialog(true)
-                    toast.success("Success Register!");
                 })
                 .catch((error) => {
                     console.log(error.message);
@@ -270,8 +269,10 @@ const Register = () => {
                                         type={"number"}
                                         className={""}
                                         {...register("age", { required: true, min: 18 })}
-                                        error={errors.age}
                                     />
+                                    {errors.age && errors.age.type === "min" ? (
+                                        <span className="text-red-500">Age must be 18 or older</span>
+                                    ) : <span className="text-red-500">Age is required</span>}
                                 </div>
 
                                 <div className="sm:col-span-2">
@@ -312,9 +313,9 @@ const Register = () => {
                 <div className="bg-white p-8 rounded shadow-md">
                     <h2 className="text-2xl font-bold mb-4">Registration Successful!</h2>
                     <p className="text-gray-600 mb-1">
-                        We have sent a verification email to your registered email address.                        
+                        We have sent a verification email to your registered email address.
                     </p>
-                    <p className="text-gray-600 mb-6">                       
+                    <p className="text-gray-600 mb-6">
                         Please verify your email to activate your account.
                     </p>
                     <button

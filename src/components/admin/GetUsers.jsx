@@ -1,11 +1,38 @@
 import { Link } from 'react-router-dom'
 import { useQuery, useMutation } from '@apollo/client'
-import { GET_USERS, GET_USERS_PAGINATION } from '../../graphQl/query'
+import { GET_USERS_PAGINATION } from '../../graphQl/query'
 import { DELETE_USER } from '../../graphQl/mutation'
-import { useEffect, useState } from 'react';
-import Pagination from '../user/Pagination';
+import React, { useState } from 'react';
+import Pagination from '../Pagination';
 import debounce from 'debounce';
 import Loader from '../Loader'
+import ContentLoader from 'react-content-loader';
+
+const TableLoader = () => (
+    <ContentLoader
+        speed={2}
+        width={1450}
+        height={420}
+        viewBox="0 0 1450 420"
+        backgroundColor="#f0f0f0"
+        foregroundColor="#d9d9d9"
+    >
+
+        <rect x="10" y="10" rx="5" ry="5" width="70" height="15" />
+        <rect x="90" y="10" rx="4" ry="4" width="465" height="15" />
+        <rect x="565" y="10" rx="3" ry="3" width="560" height="15" />
+        <rect x="1140" y="10" rx="2" ry="2" width="280" height="15" />
+
+        {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((index) => (
+            <React.Fragment key={index}>
+                <rect x="10" y={45 + index * 35} rx="5" ry="5" width="70" height="15" />
+                <rect x="90" y={45 + index * 35} rx="4" ry="4" width="465" height="15" />
+                <rect x="565" y={45 + index * 35} rx="3" ry="3" width="560" height="15" />
+                <rect x="1140" y={45 + index * 35} rx="2" ry="2" width="280" height="15" />
+            </React.Fragment>
+        ))}
+    </ContentLoader>
+);
 
 const DeleteUserModal = ({ id, onClose, onDelete }) => {
     return (
@@ -92,36 +119,31 @@ const GetUsers = () => {
         }, fetchPolicy: 'network-only'
     });
 
-    const handlePageChange = ({ selected }) => {
-        setCurrentPage(selected + 1);
+    const handlePageChange = (selected) => {
+        setCurrentPage(selected);
     };
 
     const totalPages = data?.getUsersByAdminPaginated?.totalPages;
 
     const handleDebounce = debounce((value) => {
         setSearch(value);
+        setCurrentPage(1)
+        console.log(value);
     }, 1000);
 
     const handleSearch = (e) => {
+        e.preventDefault();
         const inputValue = e.target.value;
         handleDebounce(inputValue);
     };
-
-    useEffect(() => {
-        refetch();
-    }, [currentPage, sortBy]);
 
     const handleSort = (column) => {
         setSortBy({
             column,
             order: sortBy.column === column ? sortBy.order === 1 ? -1 : 1 : 1,
         });
-        setCurrentPage(1) 
+        setCurrentPage(1)
     };
-
-    if (currentPage === 1 && loading) {      
-        return (<Loader />)
-    }
 
     return (
         <>
@@ -131,100 +153,179 @@ const GetUsers = () => {
                     <input
                         type="text"
                         placeholder="Search..."
-                        // value={search}
                         className="w-64 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
                         onChange={(e) => handleSearch(e)}
                     />
                 </div>
 
-                <table className="table-auto min-w-full border-collapse border border-gray-200">
+                <table className="table-auto w-full border-collapse border border-gray-200">
                     <thead>
                         <tr>
-                            <th className="px-4 py-2 bg-gray-100 border border-gray-200">No.</th>
+                            <th className="w-24 px-4 py-2 bg-gray-100 border border-gray-200">No.</th>
 
-                            <th onClick={() => handleSort('firstName')} className="px-4 py-2 bg-gray-100 border border-gray-200">First Name
-                                {sortBy.column === 'firstName' && sortBy.order === 'desc' && < svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 17.25 12 21m0 0-3.75-3.75M12 21V3" />
-                                </svg>}
-                                {sortBy.column === 'firstName' && sortBy.order === 'asc' && <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 6.75 12 3m0 0 3.75 3.75M12 3v18" />
-                                </svg>}
+                            <th
+                                onClick={() => handleSort('firstName')}
+                                className="w-1/6 px-4 py-2 bg-gray-100 border border-gray-200 cursor-pointer"
+                            >
+                                <span className="text-base">First Name</span>
+                                {sortBy.column === 'firstName' && (
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        strokeWidth="1.5"
+                                        stroke="currentColor"
+                                        className={`inline-block w-6 h-6 ${sortBy.order === -1 ? 'rotate-180' : ''}`}
+                                    >
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 17.25 12 21m0 0-3.75-3.75M12 21V3" />
+                                    </svg>
+                                )}
                             </th>
-                            <th onClick={() => handleSort('lastName')} className="px-4 py-2 bg-gray-100 border border-gray-200 ">Last Name
-                                {sortBy.column === 'lastName' && sortBy.order === 'desc' && < svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 17.25 12 21m0 0-3.75-3.75M12 21V3" />
-                                </svg>}
-                                {sortBy.column === 'lastName' && sortBy.order === 'asc' && <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 6.75 12 3m0 0 3.75 3.75M12 3v18" />
-                                </svg>}
+
+                            <th
+                                onClick={() => handleSort('lastName')}
+                                className="w-1/6 px-4 py-2 bg-gray-100 border border-gray-200 cursor-pointer"
+                            >
+                                <span className="text-base">Last Name</span>
+                                {sortBy.column === 'lastName' && (
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        strokeWidth="1.5"
+                                        stroke="currentColor"
+                                        className={`inline-block w-6 h-6 ${sortBy.order === -1 ? 'rotate-180' : ''}`}
+                                    >
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 17.25 12 21m0 0-3.75-3.75M12 21V3" />
+                                    </svg>
+                                )}
                             </th>
-                            <th onClick={() => handleSort('email')} className="px-4 py-2 bg-gray-100 border border-gray-200 ">Email {sortBy.column === 'email' && sortBy.order === 'desc' && < svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 17.25 12 21m0 0-3.75-3.75M12 21V3" />
-                            </svg>}
-                                {sortBy.column === 'email' && sortBy.order === 'asc' && <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 6.75 12 3m0 0 3.75 3.75M12 3v18" />
-                                </svg>}
+
+                            <th
+                                onClick={() => handleSort('email')}
+                                className="w-3/12 px-4 py-2 bg-gray-100 border border-gray-200 cursor-pointer"
+                            >
+                                <span className="text-base">Email</span>
+                                {sortBy.column === 'email' && (
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        strokeWidth="1.5"
+                                        stroke="currentColor"
+                                        className={`inline-block w-6 h-6 ${sortBy.order === -1 ? 'rotate-180' : ''}`}
+                                    >
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 17.25 12 21m0 0-3.75-3.75M12 21V3" />
+                                    </svg>
+                                )}
                             </th>
-                            <th onClick={() => handleSort('gender')} className="px-4 py-2 bg-gray-100 border border-gray-200 ">Gender {sortBy.column === 'gender' && sortBy.order === 'desc' && < svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 17.25 12 21m0 0-3.75-3.75M12 21V3" />
-                            </svg>}
-                                {sortBy.column === 'gender' && sortBy.order === 'asc' && <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 6.75 12 3m0 0 3.75 3.75M12 3v18" />
-                                </svg>}
+
+                            <th
+                                onClick={() => handleSort('gender')}
+                                className="w-24 px-4 py-2 bg-gray-100 border border-gray-200 cursor-pointer"
+                            >
+                                <span className="text-base">Gender</span>
+                                {sortBy.column === 'gender' && (
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        strokeWidth="1.5"
+                                        stroke="currentColor"
+                                        className={`inline-block w-6 h-6 ${sortBy.order === -1 ? 'rotate-180' : ''}`}
+                                    >
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 17.25 12 21m0 0-3.75-3.75M12 21V3" />
+                                    </svg>
+                                )}
                             </th>
-                            <th onClick={() => handleSort('active')} className="px-4 py-2 bg-gray-100 border border-gray-200 ">isActive {sortBy.column === 'active' && sortBy.order === 'desc' && < svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 17.25 12 21m0 0-3.75-3.75M12 21V3" />
-                            </svg>}
-                                {sortBy.column === 'active' && sortBy.order === 'asc' && <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 6.75 12 3m0 0 3.75 3.75M12 3v18" />
-                                </svg>}
+                            <th
+                                onClick={() => handleSort('active')}
+                                className="w-24 px-4 py-2 bg-gray-100 border border-gray-200 cursor-pointer"
+                            >
+                                <span className="text-base">Status</span>
+                                {sortBy.column === 'active' && (
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        strokeWidth="1.5"
+                                        stroke="currentColor"
+                                        className={`inline-block w-6 h-6 ${sortBy.order === -1 ? 'rotate-180' : ''}`}
+                                    >
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 17.25 12 21m0 0-3.75-3.75M12 21V3" />
+                                    </svg>
+                                )}
                             </th>
-                            <th onClick={() => handleSort('createdAt')} className="px-4 py-2 bg-gray-100 border border-gray-200 ">CreatedAt{sortBy.column === 'createdAt' && sortBy.order === 'desc' && < svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 17.25 12 21m0 0-3.75-3.75M12 21V3" />
-                            </svg>}
-                                {sortBy.column === 'createdAt' && sortBy.order === 'asc' && <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 6.75 12 3m0 0 3.75 3.75M12 3v18" />
-                                </svg>}
+                            <th
+                                onClick={() => handleSort('createdAt')}
+                                className="w-1/6 px-4 py-2 bg-gray-100 border border-gray-200 cursor-pointer"
+                            >
+                                <span className="text-base">CreatedAt</span>
+                                {sortBy.column === 'createdAt' && (
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        strokeWidth="1.5"
+                                        stroke="currentColor"
+                                        className={`inline-block w-6 h-6 ${sortBy.order === -1 ? 'rotate-180' : ''}`}
+                                    >
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 17.25 12 21m0 0-3.75-3.75M12 21V3" />
+                                    </svg>
+                                )}
                             </th>
-                            <th className="px-4 py-2 bg-gray-100 border border-gray-200">Posts</th>
-                            <th className="px-4 py-2 bg-gray-100 border border-gray-200">Action</th>
+                            <th className="w-1/12 px-4 py-2 bg-gray-100 border border-gray-200">Posts</th>
+                            <th className="w-1/6 px-4 py-2 bg-gray-100 border border-gray-200">Action</th>
                         </tr>
                     </thead>
                     <tbody className="text-center">
-                        {data && data?.getUsersByAdminPaginated?.docs?.map((user, index) => (
-                            <>
-                                <tr key={user._id}>
-                                    <td className="px-4 py-2 border border-gray-200">{(index + 1) + ((currentPage - 1) * 2)}</td>
-                                    <td className="px-4 py-2 border border-gray-200">{user.firstName}</td>
-                                    <td className="px-4 py-2 border border-gray-200">{user.lastName}</td>
-                                    <td className="px-4 py-2 border border-gray-200">{user.email}</td>
-                                    <td className="px-4 py-2 border border-gray-200">{user.gender}</td>
-                                    <td className="px-4 py-2 border border-gray-200">{user.active ? "Active" : "Deactive"}</td>
+                        {loading ?
+                            <tr>
+                                <td colSpan='9' className='py-4 px-2 text-center'><TableLoader /></td>
+                            </tr>
+                            : data ? data?.getUsersByAdminPaginated?.docs?.map((user, index) => (
+                                <>
+                                    <tr key={user._id}>
+                                        <td className="px-4 py-2 border border-gray-200">{(index + 1) + ((currentPage - 1) * 2)}</td>
+                                        <td className="px-4 py-2 border border-gray-200">{user.firstName}</td>
+                                        <td className="px-4 py-2 border border-gray-200">{user.lastName}</td>
+                                        <td className="px-4 py-2 border border-gray-200">{user.email}</td>
+                                        <td className="px-4 py-2 border border-gray-200">{user.gender}</td>
+                                        <td className="px-4 py-2 border border-gray-200">{user.active ? "Active" : "Deactive"}</td>
 
-                                    <td className="px-4 py-2 border border-gray-200">{user.createdAt}</td>
-                                    <td className="px-4 py-2 border border-gray-200"><Link to={`view-post/${user._id}`} className='text-sky-500'>view Posts</Link></td>
-                                    <td className="px-4 py-2 border border-gray-200 flex justify-center space-x-3">
-                                        <Link to={`update-user/${user._id}`} className="flex w-12 justify-center rounded-md border-solid border-2 border-sky-500 px-3 py-1.5 text-sm font-semibold leading-6  shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 mt-3">
-                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
-                                                <path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-8.4 8.4a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32l8.4-8.4Z" />
-                                                <path d="M5.25 5.25a3 3 0 0 0-3 3v10.5a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3V13.5a.75.75 0 0 0-1.5 0v5.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5V8.25a1.5 1.5 0 0 1 1.5-1.5h5.25a.75.75 0 0 0 0-1.5H5.25Z" />
-                                            </svg>
-                                        </Link>
-                                        <button onClick={() => handleOpenModal(user._id)} className="flex w-12 justify-center rounded-md border-solid border-2 border-sky-500 px-3 py-1.5 text-sm font-semibold leading-6  shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 mt-3">
-                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
-                                                <path fillRule="evenodd" d="M16.5 4.478v.227a48.816 48.816 0 0 1 3.878.512.75.75 0 1 1-.256 1.478l-.209-.035-1.005 13.07a3 3 0 0 1-2.991 2.77H8.084a3 3 0 0 1-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 0 1-.256-1.478A48.567 48.567 0 0 1 7.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 0 1 3.369 0c1.603.051 2.815 1.387 2.815 2.951Zm-6.136-1.452a51.196 51.196 0 0 1 3.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 0 0-6 0v-.113c0-.794.609-1.428 1.364-1.452Zm-.355 5.945a.75.75 0 1 0-1.5.058l.347 9a.75.75 0 1 0 1.499-.058l-.346-9Zm5.48.058a.75.75 0 1 0-1.498-.058l-.347 9a.75.75 0 0 0 1.5.058l.345-9Z" clipRule="evenodd" />
-                                            </svg>
-                                        </button>
-                                    </td>
+                                        <td className="px-4 py-2 border border-gray-200">{user.createdAt}</td>
+                                        <td className="px-4 py-2 border border-gray-200"><Link to={`view-post/${user._id}`} className='text-sky-500'>view Posts</Link></td>
+                                        <td className="px-4 py-2 border border-gray-200 flex justify-center space-x-3">
+                                            <Link to={`update-user/${user._id}`} className="flex w-12 justify-center rounded-md border-solid border-2 border-sky-500 px-3 py-1.5 text-sm font-semibold leading-6  shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 mt-3">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+                                                    <path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-8.4 8.4a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32l8.4-8.4Z" />
+                                                    <path d="M5.25 5.25a3 3 0 0 0-3 3v10.5a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3V13.5a.75.75 0 0 0-1.5 0v5.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5V8.25a1.5 1.5 0 0 1 1.5-1.5h5.25a.75.75 0 0 0 0-1.5H5.25Z" />
+                                                </svg>
+                                            </Link>
+                                            <button onClick={() => handleOpenModal(user._id)} className="flex w-12 justify-center rounded-md border-solid border-2 border-sky-500 px-3 py-1.5 text-sm font-semibold leading-6  shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 mt-3">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+                                                    <path fillRule="evenodd" d="M16.5 4.478v.227a48.816 48.816 0 0 1 3.878.512.75.75 0 1 1-.256 1.478l-.209-.035-1.005 13.07a3 3 0 0 1-2.991 2.77H8.084a3 3 0 0 1-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 0 1-.256-1.478A48.567 48.567 0 0 1 7.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 0 1 3.369 0c1.603.051 2.815 1.387 2.815 2.951Zm-6.136-1.452a51.196 51.196 0 0 1 3.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 0 0-6 0v-.113c0-.794.609-1.428 1.364-1.452Zm-.355 5.945a.75.75 0 1 0-1.5.058l.347 9a.75.75 0 1 0 1.499-.058l-.346-9Zm5.48.058a.75.75 0 1 0-1.498-.058l-.347 9a.75.75 0 0 0 1.5.058l.345-9Z" clipRule="evenodd" />
+                                                </svg>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </>
+                            ))
+                                :
+                                <tr>
+                                    <td colSpan='9' className='py-4 px-2 text-center'>No data found</td>
                                 </tr>
-                            </>
-                        ))}
+                        }
                     </tbody>
                 </table>
-                <div className='fixed bottom-16 left-0 right-0 mx-auto my-auto'>
-                    <Pagination pageCount={totalPages} onPageChange={handlePageChange} />
-                </div>
+
+                {data && (
+                    <div className='fixed bottom-16 left-0 right-0 mx-auto my-auto'>
+                        <Pagination pageCount={totalPages} currentPage={currentPage} onPageChange={handlePageChange} pageRange={2} />
+                    </div>
+                )}
             </div>
+
             {isModalOpen && <DeleteUserModal onClose={handleCloseModal} onDelete={handleDeleteModal} />
             }
         </>

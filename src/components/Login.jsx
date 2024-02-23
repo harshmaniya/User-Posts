@@ -21,6 +21,7 @@ const Login = () => {
     const {
         register,
         handleSubmit,
+        reset,
         formState: { errors },
     } = useForm({
         defaultValues: { email: "", password: "" }
@@ -65,11 +66,13 @@ const Login = () => {
                 toast.success("login successful!");
             })
             .catch((error) => {
-                console.log(error.message);
-                toast.error(error.message);
-                if (error.message === "NOT_VERIFIED") {
+                console.log(error.message);            
+                if (error.message === "NOT_VERIFIED") {                    
                     setEmail(data.email)
                     setVerifyDialog(true)
+                    reset()
+                }else{
+                    toast.error(error.message);
                 }
             });
     }
